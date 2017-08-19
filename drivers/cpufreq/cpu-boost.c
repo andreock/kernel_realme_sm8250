@@ -1,6 +1,20 @@
+<<<<<<< HEAD
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2013-2015,2017,2019, The Linux Foundation. All rights reserved.
+=======
+/*
+ * Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
  */
 
 #define pr_fmt(fmt) "cpu-boost: " fmt
@@ -10,6 +24,7 @@
 #include <linux/cpufreq.h>
 #include <linux/cpu.h>
 #include <linux/sched.h>
+<<<<<<< HEAD
 #include <linux/slab.h>
 #include <linux/input.h>
 #include <linux/time.h>
@@ -35,6 +50,12 @@ const char *buf, size_t count)					\
 	sscanf(buf, "%u", &file_name);				\
 	return count;						\
 }
+=======
+#include <linux/moduleparam.h>
+#include <linux/slab.h>
+#include <linux/input.h>
+#include <linux/time.h>
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 
 struct cpu_sync {
 	int cpu;
@@ -46,6 +67,7 @@ static DEFINE_PER_CPU(struct cpu_sync, sync_info);
 static struct workqueue_struct *cpu_boost_wq;
 
 static struct work_struct input_boost_work;
+<<<<<<< HEAD
 
 static bool input_boost_enabled;
 
@@ -60,14 +82,24 @@ store_one(sched_boost_on_input);
 cpu_boost_attr_rw(sched_boost_on_input);
 
 static bool sched_boost_active;
+=======
+static bool input_boost_enabled;
+
+static unsigned int input_boost_ms = 40;
+module_param(input_boost_ms, uint, 0644);
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 
 static struct delayed_work input_boost_rem;
 static u64 last_input_time;
 #define MIN_INPUT_INTERVAL (150 * USEC_PER_MSEC)
 
+<<<<<<< HEAD
 static ssize_t store_input_boost_freq(struct kobject *kobj,
 				      struct kobj_attribute *attr,
 				      const char *buf, size_t count)
+=======
+static int set_input_boost_freq(const char *buf, const struct kernel_param *kp)
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 {
 	int i, ntokens = 0;
 	unsigned int val, cpu;
@@ -94,11 +126,19 @@ static ssize_t store_input_boost_freq(struct kobject *kobj,
 	for (i = 0; i < ntokens; i += 2) {
 		if (sscanf(cp, "%u:%u", &cpu, &val) != 2)
 			return -EINVAL;
+<<<<<<< HEAD
 		if (cpu >= num_possible_cpus())
 			return -EINVAL;
 
 		per_cpu(sync_info, cpu).input_boost_freq = val;
 		cp = strnchr(cp, PAGE_SIZE - (cp - buf), ' ');
+=======
+		if (cpu > num_possible_cpus())
+			return -EINVAL;
+
+		per_cpu(sync_info, cpu).input_boost_freq = val;
+		cp = strchr(cp, ' ');
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 		cp++;
 	}
 
@@ -111,11 +151,18 @@ check_enable:
 	}
 	input_boost_enabled = enabled;
 
+<<<<<<< HEAD
 	return count;
 }
 
 static ssize_t show_input_boost_freq(struct kobject *kobj,
 				     struct kobj_attribute *attr, char *buf)
+=======
+	return 0;
+}
+
+static int get_input_boost_freq(char *buf, const struct kernel_param *kp)
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 {
 	int cnt = 0, cpu;
 	struct cpu_sync *s;
@@ -129,12 +176,29 @@ static ssize_t show_input_boost_freq(struct kobject *kobj,
 	return cnt;
 }
 
+<<<<<<< HEAD
 cpu_boost_attr_rw(input_boost_freq);
+=======
+static const struct kernel_param_ops param_ops_input_boost_freq = {
+	.set = set_input_boost_freq,
+	.get = get_input_boost_freq,
+};
+module_param_cb(input_boost_freq, &param_ops_input_boost_freq, NULL, 0644);
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 
 /*
  * The CPUFREQ_ADJUST notifier is used to override the current policy min to
  * make sure policy min >= boost_min. The cpufreq framework then does the job
  * of enforcing the new policy.
+<<<<<<< HEAD
+=======
+ *
+ * The sync kthread needs to run on the CPU in question to avoid deadlocks in
+ * the wake up code. Achieve this by binding the thread to the respective
+ * CPU. But a CPU going offline unbinds threads from that CPU. So, set it up
+ * again each time the CPU comes back up. We can use CPUFREQ_START to figure
+ * out a CPU is coming online instead of registering for hotplug notifiers.
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
  */
 static int boost_adjust_notify(struct notifier_block *nb, unsigned long val,
 				void *data)
@@ -182,7 +246,11 @@ static void update_policy_online(void)
 
 static void do_input_boost_rem(struct work_struct *work)
 {
+<<<<<<< HEAD
 	unsigned int i, ret;
+=======
+	unsigned int i;
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 	struct cpu_sync *i_sync_info;
 
 	/* Reset the input_boost_min for all CPUs in the system */
@@ -195,16 +263,20 @@ static void do_input_boost_rem(struct work_struct *work)
 	/* Update policies for all online CPUs */
 	update_policy_online();
 
+<<<<<<< HEAD
 	if (sched_boost_active) {
 		ret = sched_set_boost(0);
 		if (ret)
 			pr_err("cpu-boost: sched boost disable failed\n");
 		sched_boost_active = false;
 	}
+=======
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 }
 
 static void do_input_boost(struct work_struct *work)
 {
+<<<<<<< HEAD
 	unsigned int i, ret;
 	struct cpu_sync *i_sync_info;
 
@@ -213,6 +285,12 @@ static void do_input_boost(struct work_struct *work)
 		sched_set_boost(0);
 		sched_boost_active = false;
 	}
+=======
+	unsigned int i;
+	struct cpu_sync *i_sync_info;
+
+	cancel_delayed_work_sync(&input_boost_rem);
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 
 	/* Set the input_boost_min for all CPUs in the system */
 	pr_debug("Setting input boost min for all CPUs\n");
@@ -224,6 +302,7 @@ static void do_input_boost(struct work_struct *work)
 	/* Update policies for all online CPUs */
 	update_policy_online();
 
+<<<<<<< HEAD
 	/* Enable scheduler boost to migrate tasks to big cluster */
 	if (sched_boost_on_input > 0) {
 		ret = sched_set_boost(sched_boost_on_input);
@@ -233,6 +312,8 @@ static void do_input_boost(struct work_struct *work)
 			sched_boost_active = true;
 	}
 
+=======
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 	queue_delayed_work(cpu_boost_wq, &input_boost_rem,
 					msecs_to_jiffies(input_boost_ms));
 }
@@ -327,7 +408,10 @@ static struct input_handler cpuboost_input_handler = {
 	.id_table       = cpuboost_ids,
 };
 
+<<<<<<< HEAD
 struct kobject *cpu_boost_kobj;
+=======
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 static int cpu_boost_init(void)
 {
 	int cpu, ret;
@@ -345,6 +429,7 @@ static int cpu_boost_init(void)
 		s->cpu = cpu;
 	}
 	cpufreq_register_notifier(&boost_adjust_nb, CPUFREQ_POLICY_NOTIFIER);
+<<<<<<< HEAD
 
 	cpu_boost_kobj = kobject_create_and_add("cpu_boost",
 						&cpu_subsys.dev_root->kobj);
@@ -366,5 +451,10 @@ static int cpu_boost_init(void)
 
 	ret = input_register_handler(&cpuboost_input_handler);
 	return 0;
+=======
+	ret = input_register_handler(&cpuboost_input_handler);
+
+	return ret;
+>>>>>>> 2c8283ff4c25 (cpu-boost: Pull in Modified version for EAS)
 }
 late_initcall(cpu_boost_init);
