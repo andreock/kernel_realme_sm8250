@@ -24,24 +24,10 @@ static struct proc_dir_entry *dstate_dir = NULL;
 
 static void g_dump_waker_stack(unsigned int waker_nr_entries, unsigned long *waker_entries)
 {
-	int i;
-	char buf[128];
-
-	for (i = waker_nr_entries - 1; i >= 0; i--) {
-		snprintf(buf, sizeof(buf), "%pS\n", (void *)waker_entries[i]);
-		trace_printk(buf);
-	}
 }
 
 static void g_dump_wakee_stack(unsigned int wakee_nr_entries, unsigned long *wakee_entries)
 {
-	int i;
-	char buf[128];
-
-	for (i = wakee_nr_entries - 1; i >= 0; i--) {
-		snprintf(buf, sizeof(buf), "%pS\n", (void *)wakee_entries[i]);
-		trace_printk(buf);
-	}
 }
 
 static void g_dstate_dump_stack(struct task_struct *task, u64 delay_ms)
@@ -51,7 +37,6 @@ static void g_dstate_dump_stack(struct task_struct *task, u64 delay_ms)
 	unsigned long waker_entries[MAX_DSTATE_STACK_TRACE_DEPTH];
 	unsigned int wakee_nr_entries;
 	unsigned long wakee_entries[MAX_DSTATE_STACK_TRACE_DEPTH];
-	char buf[256];
 
 	struct stack_trace waker_dummy;
 	struct stack_trace wakee_dummy;
@@ -69,12 +54,6 @@ static void g_dstate_dump_stack(struct task_struct *task, u64 delay_ms)
 	save_stack_trace_tsk(task, &wakee_dummy);
 	wakee_nr_entries = wakee_dummy.nr_entries;
 	caller = (void *)get_wchan(task);
-
-	snprintf(buf, sizeof(buf), "delay_ms=%d, waker_nr_entries=%d, wakee_nr_entries=%d,"
-		" waker:%s tid:%d pid:%d, wakee:%s tid:%d pid:%d, blocked_func=%pS\n",
-		delay_ms, waker_nr_entries, wakee_nr_entries,
-		current->comm, current->pid, current->tgid, task->comm, task->pid, task->tgid, caller);
-	trace_printk(buf);
 
 	g_dump_waker_stack(waker_nr_entries, waker_entries);
 	g_dump_wakee_stack(wakee_nr_entries, wakee_entries);
