@@ -23,8 +23,10 @@
  */
 
 #include <linux/linkage.h>
+
 #include <asm/assembler.h>
 #include <asm/cache.h>
+#include <asm/export.h>
 
 /*
  * Fill in the buffer with character c (alignment handled by the hardware)
@@ -215,4 +217,6 @@ WEAK(memset)
 	b.ne	.Ltail_maybe_long
 	ret
 ENDPIPROC(memset)
+EXPORT_SYMBOL(memset)
 ENDPROC(__memset)
+EXPORT_SYMBOL(__memset)
