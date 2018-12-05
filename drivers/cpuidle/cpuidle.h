@@ -9,6 +9,7 @@
 #include "../soc/oplus/game_opt/game_ctrl.h"
 #endif
 /* For internal use only */
+extern char param_governor[];
 extern struct cpuidle_governor *cpuidle_curr_governor;
 extern struct list_head cpuidle_governors;
 extern struct list_head cpuidle_detected_devices;
