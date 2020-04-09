@@ -4172,6 +4172,7 @@
 				<125 512 0 0>,
 				<125 512 393600 393600>;
 		qcom,smmu-s1-enable;
+		qcom,converged-dt;
 		qcom,no-clock-support;
 		iommus = <&apps_smmu 0x0586 0x0011>,
 			 <&apps_smmu 0x0596 0x0011>;
