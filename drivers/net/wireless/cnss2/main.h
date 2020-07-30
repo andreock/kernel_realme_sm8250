@@ -431,6 +431,7 @@ struct cnss_plat_data {
 	unsigned long loadBdfState;
 	unsigned long loadRegdbState;
     #endif /* OPLUS_FEATURE_WIFI_DCS_SWITCH */
+
 };
 
 #ifdef OPLUS_FEATURE_WIFI_DCS_SWITCH
