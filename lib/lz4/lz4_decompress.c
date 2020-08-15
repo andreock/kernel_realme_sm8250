@@ -423,6 +423,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 			      (op <= shortoend))) {
 			/* Copy the literals */
 			LZ4_memcpy(op, ip, endOnInput ? 16 : 8);
+
 			op += length;
 			ip += length;
 
@@ -538,6 +539,7 @@ static FORCE_INLINE int LZ4_decompress_generic(
 			 * for in-place decompression scenarios
 			 */
 			LZ4_memmove(op, ip, length);
+
 			ip += length;
 			op += length;
 
