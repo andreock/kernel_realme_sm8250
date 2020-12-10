@@ -117,6 +117,30 @@ int mb_cache_entry_create(struct mb_cache *cache, gfp_t mask, u32 key,
 		}
 	}
 	list_add(&req.lnode, &bucket->req_list);
+
+	hlist_bl_unlock(head);
+
+	entry = kmem_cache_alloc(mb_entry_cache, mask);
+	if (!entry) {
+		hlist_bl_lock(head);
+		list_del(&req.lnode);
+		hlist_bl_unlock(head);
+		return -ENOMEM;
+	}
+
+	*entry = (typeof(*entry)){
+		.e_list = LIST_HEAD_INIT(entry->e_list),
+		/* One ref for hash, one ref returned */
+		.e_refcnt = ATOMIC_INIT(2),
+		.e_key = key,
+		.e_value = value,
+		.e_reusable = reusable
+	};
+
+	hlist_bl_lock(head);
+	list_del(&req.lnode);
+	hlist_bl_add_head(&entry->e_hash_list, head);
+
 	hlist_bl_unlock(head);
 
 	entry = kmem_cache_alloc(mb_entry_cache, mask);
