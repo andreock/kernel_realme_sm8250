@@ -716,11 +716,6 @@ EXPORT_SYMBOL_GPL(cpuidle_register);
 static int cpuidle_latency_notify(struct notifier_block *b,
 		unsigned long l, void *v)
 {
-	unsigned long cpus = atomic_read(&idled) & *cpumask_bits(to_cpumask(v));
-
-	if (cpus)
-		smp_send_ipi(to_cpumask(&cpus));
-
 	return NOTIFY_OK;
 }
 
