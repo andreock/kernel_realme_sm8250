@@ -6974,6 +6974,7 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 	}
 
 	vbus_rising = (bool)(stat & USBIN_PLUGIN_RT_STS_BIT);
+
 #ifdef OPLUS_FEATURE_CHG_BASIC
 	oplus_chg_track_check_wired_charging_break(vbus_rising);
 	chg->real_chg_type = POWER_SUPPLY_TYPE_UNKNOWN;
@@ -6996,6 +6997,7 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 #endif // OPLUS_CUSTOM_OP_DEF
 
 #ifdef OPLUS_FEATURE_CHG_BASIC
+
 #ifdef OPLUS_CUSTOM_OP_DEF
 	if (!chg->wireless_present) {
 		smblib_set_dc_suspend(chg, true);
@@ -7078,6 +7080,7 @@ void smblib_usb_plugin_locked(struct smb_charger *chg)
 #ifdef OPLUS_CUSTOM_OP_DEF
 		fastchging = oplus_vooc_get_fastchg_started();
 #endif
+
 #ifdef OPLUS_FEATURE_CHG_BASIC
 		chg->hvdcp_detach_time = cpu_clock(smp_processor_id()) / 1000000;
 		printk(KERN_ERR "!!! %s: the hvdcp_detach_time:%lu\n", __func__, chg->hvdcp_detach_time);
@@ -11394,7 +11397,7 @@ bool oplus_chg_check_pd_svooc_adapater(void)
 }
 EXPORT_SYMBOL(oplus_chg_check_pd_svooc_adapater);
 
-void oplus_set_typec_sinkonly()
+void oplus_set_typec_sinkonly(void)
 {
 	int rc;
 	struct smb_charger *chg = NULL;
@@ -16707,7 +16710,7 @@ void oplus_set_flash_screen_ctrl_by_pcb_version(struct oplus_chg_chip *chip)
 }
 #endif
 extern int oplus_pdo_select(int vbus_mv, int ibus_ma);
-int oplus_chg_set_pd_config()
+int oplus_chg_set_pd_config(void)
 {
 	int ret = 0;
 	struct oplus_chg_chip *chip = g_oplus_chip;
@@ -16800,7 +16803,7 @@ int oplus_chg_enable_qc_detect(void)
 	return ret;
 }
 
-int oplus_chg_set_qc_config()
+int oplus_chg_set_qc_config(void)
 {
 	int ret = 0;
 	struct smb_charger *chg = NULL;
@@ -17247,6 +17250,7 @@ static int smb5_probe(struct platform_device *pdev)
 		pr_err("[OPLUS_CHG] test chg->iio.chgid_v_chan \n");
 	}
 #endif
+
 #ifdef OPLUS_FEATURE_CHG_BASIC
 	rc = of_property_match_string(chg->dev->of_node, "io-channel-names", "usb_temp_adc");
 	if (rc >= 0) {
@@ -17262,6 +17266,7 @@ static int smb5_probe(struct platform_device *pdev)
 		pr_err("[OPLUS_CHG] test chg->iio.usb_temp_adc \n");
 	}
 	pr_err("[OPLUS_CHG] test chg->iio.usb_temp_adc out here\n");
+
 	rc = of_property_match_string(chg->dev->of_node, "io-channel-names", "btb_temp_therm");
 	if (rc >= 0) {
 		chg->iio.btbtemp_v_chan = iio_channel_get(chg->dev,
@@ -17276,6 +17281,7 @@ static int smb5_probe(struct platform_device *pdev)
 		pr_err("[OPLUS_CHG] test chg->iio.btb_temp_therm \n");
 	}
 	pr_err("[OPLUS_CHG] test chg->iio.btb_temp_therm out here\n");
+
 	rc = of_property_match_string(chg->dev->of_node, "io-channel-names", "usb_supplementary_temp_adc");
 	if (rc >= 0) {
 		chg->iio.usbtemp_sup_v_chan = iio_channel_get(chg->dev,
