@@ -2264,7 +2264,6 @@ void suspend_console(void)
 {
 	if (!console_suspend_enabled)
 		return;
-
 	console_lock();
 	console_suspended = 1;
 	up_console_sem();
