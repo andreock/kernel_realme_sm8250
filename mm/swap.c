@@ -1070,6 +1070,7 @@ EXPORT_SYMBOL(pagevec_lookup_range_nr_tag);
  * Perform any setup for the swap system
  */
 void __init swap_setup(void)
+{
 	/*
 	 * Right now other parts of the system means that we
 	 * _really_ don't want to cluster much more

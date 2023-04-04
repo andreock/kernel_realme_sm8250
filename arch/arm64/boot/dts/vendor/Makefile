@@ -7,7 +7,6 @@ vendor := $(srctree)/$(src)
 #	subdir-y += qcom
 #endif
 #else
-subdir-y += qcom
 ifeq ($(strip $(BRAND_SHOW_FLAG)), oneplus)
 #oneplus SM8250 project
 subdir-y += 19821
