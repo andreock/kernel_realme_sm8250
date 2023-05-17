@@ -4706,10 +4706,10 @@ int dsi_panel_drv_init(struct dsi_panel *panel,
             if (!strcmp(panel->type, "primary"))
                 goto error_pinctrl_deinit;
 	        rc = 0;
-	    } else 
+	    } else
 #endif
 		    goto error_pinctrl_deinit;
-	    
+
 	}
 
 
@@ -5378,6 +5378,13 @@ int dsi_panel_set_lp2(struct dsi_panel *panel)
 	if (!panel->panel_initialized)
 		goto exit;
 
+	//It has been observed entering lp2 without first entering lp1 on doze.
+	//In this case regulator stays in NORMAL mode, which is a power regression.
+	if (dsi_panel_is_type_oled(panel) &&
+	    panel->power_mode != SDE_MODE_DPMS_LP1)
+		dsi_pwr_panel_regulator_mode_set(&panel->power_info,
+			"ibb", REGULATOR_MODE_IDLE);
+
 	rc = dsi_panel_tx_cmd_set(panel, DSI_CMD_SET_LP2);
 	if (rc)
 		DSI_ERR("[%s] failed to send DSI_CMD_SET_LP2 cmd, rc=%d\n",
@@ -6043,7 +6050,7 @@ int dsi_panel_disable(struct dsi_panel *panel)
 	#endif /* OPLUS_BUG_STABILITY */
 
 #if defined(OPLUS_FEATURE_PXLW_IRIS5)
-		if (iris_is_chip_supported())			
+		if (iris_is_chip_supported())
             iris_disable(panel, NULL);
 #endif
 
