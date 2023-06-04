@@ -169,15 +169,6 @@ enum zone_stat_item {
 	NR_ZSPAGES,		/* allocated in zsmalloc */
 #endif
 	NR_FREE_CMA_PAGES,
-#if defined(OPLUS_FEATURE_MEMORY_ISOLATE) && defined(CONFIG_OPLUS_MEMORY_ISOLATE)
-/*
- * Account free pages for MIGRATE_OPLUS
- */
-	NR_FREE_OPLUS2_PAGES,
-#endif /* OPLUS_FEATURE_MEMORY_ISOLATE */
-#ifdef OPLUS_FEATURE_HEALTHINFO
-        NR_IONCACHE_PAGES,
-#endif /* OPLUS_FEATURE_HEALTHINFO */
 	NR_VM_ZONE_STAT_ITEMS };
 
 enum node_stat_item {
