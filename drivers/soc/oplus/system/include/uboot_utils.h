@@ -147,7 +147,7 @@ static phys_addr_t uboot_base;
 static phys_addr_t uboot_size;
 
 
-#if defined(CONFIG_PRINTK) && defined(CONFIG_OPLUS_FEATURE_UBOOT_LOG)
+#if defined(CONFIG_PRINTK)
 bool back_kmsg_dump_get_buffer(struct kmsg_dumper *dumper, bool syslog,
 			  char *buf, size_t size, size_t *len);
 

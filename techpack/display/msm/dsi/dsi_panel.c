@@ -28,10 +28,6 @@
 #include "oplus_display_panel_cabc.h"
 #endif
 
-#ifdef CONFIG_OPLUS_FEATURE_MISC
-#include <soc/oplus/system/oplus_misc.h>
-#endif
-
 #ifdef OPLUS_FEATURE_ADFR
 #include "oplus_adfr.h"
 #include "sde_trace.h"
@@ -1127,15 +1123,6 @@ static int dsi_panel_wled_register(struct dsi_panel *panel,
 	return 0;
 }
 
-#ifdef CONFIG_OPLUS_FEATURE_MISC
-static int saved_backlight = -1;
-
-int dsi_panel_backlight_get(void)
-{
-	return saved_backlight;
-}
-#endif
-
 #ifdef OPLUS_BUG_STABILITY
 int enable_global_hbm_flags = 0;
 #endif
@@ -1166,9 +1153,7 @@ static int dsi_panel_update_backlight(struct dsi_panel *panel,
 	}
 
 	dsi = &panel->mipi_device;
-#ifdef CONFIG_OPLUS_FEATURE_MISC
-	saved_backlight = bl_lvl;
-#endif
+
 	bl = &panel->bl_config;
 
 	if (panel->bl_config.bl_inverted_dbv)

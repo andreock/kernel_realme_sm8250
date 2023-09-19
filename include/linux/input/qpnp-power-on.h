@@ -88,9 +88,6 @@ struct qpnp_pon {
 	struct pon_regulator	*pon_reg_cfg;
 	struct list_head	list;
 	struct delayed_work	bark_work;
-#ifdef CONFIG_OPLUS_FEATURE_MISC
-	struct delayed_work press_work;
-#endif
 	struct dentry		*debugfs;
 	struct task_struct *wd_task;
 	struct mutex		wd_task_mutex;
