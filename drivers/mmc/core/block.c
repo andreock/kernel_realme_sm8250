@@ -1118,16 +1118,12 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
 
 	switch (mq_rq->drv_op) {
 	case MMC_DRV_OP_IOCTL:
-#ifndef OPLUS_FEATURE_STORAGE_TOOL
-/* If data size in ioctl too large ,kernel will panic */
-		pr_err("mmc __mmc_blk_ioctl_cmd enter cardState 0x%x ,cmdq(%d %d %d) , adma2len %d\n",
-			card->state,
-			card->ext_csd.cmdq_en,
-			card->ext_csd.cmdq_depth,
-			card->ext_csd.cmdq_support,
-			card->host->max_seg_size
-		);
-#endif
+		if (card->ext_csd.cmdq_en) {
+			ret = mmc_cmdq_disable(card);
+			if (ret)
+				break;
+		}
+		/* fallthrough */
 	case MMC_DRV_OP_IOCTL_RPMB:
 		idata = mq_rq->drv_op_data;
 		for (i = 0, ret = 0; i < mq_rq->ioc_count; i++) {
@@ -1138,6 +1134,8 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
 		/* Always switch back to main area after RPMB access */
 		if (rpmb_ioctl)
 			mmc_blk_part_switch(card, 0);
+		else if (card->reenable_cmdq && !card->ext_csd.cmdq_en)
+			mmc_cmdq_enable(card);
 		break;
 	case MMC_DRV_OP_BOOT_WP:
 		ret = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL, EXT_CSD_BOOT_WP,
