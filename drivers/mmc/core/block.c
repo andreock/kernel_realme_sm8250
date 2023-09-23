@@ -1803,7 +1803,7 @@ static void mmc_blk_read_single(struct mmc_queue *mq, struct request *req)
 
 			if (!mrq->cmd->error)
 				break;
- 		}
+		}
 
 		if (mrq->cmd->error ||
 		    mrq->data->error ||
