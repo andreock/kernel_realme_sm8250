@@ -12,6 +12,7 @@
 #include <linux/stddef.h>
 #include <linux/types.h>
 #include <linux/uidgid.h>
+#include <uapi/linux/android/binderfs.h>
 #ifdef CONFIG_OPLUS_FEATURE_CPU_JANKINFO
 #include "binder_alloc.h"
 #endif
@@ -136,7 +137,7 @@ struct binder_transaction_log_entry {
 	int return_error_line;
 	uint32_t return_error;
 	uint32_t return_error_param;
-	const char *context_name;
+	char context_name[BINDERFS_MAX_NAME + 1];
 };
 
 struct binder_transaction_log {
