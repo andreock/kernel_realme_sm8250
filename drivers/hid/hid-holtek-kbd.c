@@ -148,10 +148,6 @@ static int holtek_kbd_probe(struct hid_device *hdev,
 
 	if (!hid_is_usb(hdev))
 		return -EINVAL;
-	ret = hid_parse(hdev);
-
-	if (!hid_is_usb(hdev))
-		return -EINVAL;
 
 	ret = hid_parse(hdev);
 	if (!ret)

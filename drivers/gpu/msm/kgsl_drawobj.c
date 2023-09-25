@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (c) 2016-2021, The Linux Foundation. All rights reserved.
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023, Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 /*
@@ -46,8 +46,7 @@ static void syncobj_destroy_object(struct kgsl_drawobj *drawobj)
 		struct kgsl_drawobj_sync_event *event = &syncobj->synclist[i];
 
 		if (event->type == KGSL_CMD_SYNCPOINT_TYPE_FENCE) {
-			struct event_fence_info *priv = event ?
-					event->priv : NULL;
+			struct event_fence_info *priv = event->priv;
 
 			if (priv) {
 				kfree(priv->fences);
@@ -114,8 +113,7 @@ void kgsl_dump_syncpoints(struct kgsl_device *device,
 		}
 		case KGSL_CMD_SYNCPOINT_TYPE_FENCE: {
 			int j;
-			struct event_fence_info *info = event ?
-					event->priv : NULL;
+			struct event_fence_info *info = event->priv;
 
 			for (j = 0; info && j < info->num_fences; j++)
 				dev_err(device->dev, "[%d]  fence: %s\n",
@@ -181,8 +179,7 @@ static void syncobj_timer(struct timer_list *t)
 			break;
 		case KGSL_CMD_SYNCPOINT_TYPE_FENCE: {
 			int j;
-			struct event_fence_info *info = event ?
-					event->priv : NULL;
+			struct event_fence_info *info = event->priv;
 
 			for (j = 0; info && j < info->num_fences; j++)
 				dev_err(device->dev, "       [%u] FENCE %s\n",
@@ -286,7 +283,7 @@ static void drawobj_destroy_sparse(struct kgsl_drawobj *drawobj)
 	}
 }
 
-static void drawobj_sync_timeline_fence_work(struct irq_work *work)
+static void drawobj_sync_timeline_fence_work(struct work_struct *work)
 {
 	struct kgsl_drawobj_sync_event *event = container_of(work,
 		struct kgsl_drawobj_sync_event, work);
@@ -306,7 +303,7 @@ static void drawobj_sync_timeline_fence_callback(struct dma_fence *f,
 	 * removing the fence
 	 */
 	if (drawobj_sync_expire(event->device, event))
-		irq_work_queue(&event->work);
+		queue_work(kgsl_driver.mem_workqueue, &event->work);
 }
 
 static void syncobj_destroy(struct kgsl_drawobj *drawobj)
@@ -422,7 +419,7 @@ EXPORT_SYMBOL(kgsl_drawobj_destroy);
 static bool drawobj_sync_fence_func(void *priv)
 {
 	struct kgsl_drawobj_sync_event *event = priv;
-	struct event_fence_info *info = event ? event->priv : NULL;
+	struct event_fence_info *info = event->priv;
 	int i;
 
 	for (i = 0; info && i < info->num_fences; i++)
@@ -500,7 +497,7 @@ static int drawobj_add_sync_timeline(struct kgsl_device *device,
 	event->device = device;
 	event->context = NULL;
 	event->fence = fence;
-	init_irq_work(&event->work, drawobj_sync_timeline_fence_work);
+	INIT_WORK(&event->work, drawobj_sync_timeline_fence_work);
 
 	INIT_LIST_HEAD(&event->cb.node);
 
