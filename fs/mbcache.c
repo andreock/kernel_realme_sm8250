@@ -132,8 +132,7 @@ int mb_cache_entry_create(struct mb_cache *cache, gfp_t mask, u32 key,
 		/* One ref for hash, one ref returned */
 		.e_refcnt = ATOMIC_INIT(2),
 		.e_key = key,
-		.e_value = value,
-		.e_reusable = reusable
+		.e_value = value
 	};
 
 	hlist_bl_lock(head);
