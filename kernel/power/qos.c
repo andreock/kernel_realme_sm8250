@@ -410,7 +410,7 @@ static int pm_qos_update_target_cpus(struct pm_qos_constraints *c,
  *  otherwise.
  */
 int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
-			 enum pm_qos_req_action action, int value)
+			 enum pm_qos_req_action action, int value, bool dev_req)
 {
 	return pm_qos_update_target_cpus(c, node, action, value, 0);
 }
@@ -578,7 +578,7 @@ static void pm_qos_irq_release(struct kref *ref)
 }
 
 static void pm_qos_irq_notify(struct irq_affinity_notify *notify,
-		const cpumask_t *unused_mask)
+		const cpumask_t *mask)
 {
 	struct pm_qos_request *req = container_of(notify,
 					struct pm_qos_request, irq_notify);
