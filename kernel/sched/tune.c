@@ -127,10 +127,6 @@ struct schedtune {
 	bool top_task_filter;
 	bool ed_task_filter;
 #endif
-
-	/* Hint to bias scheduling of tasks on that SchedTune CGroup
-	 * towards higher capacity CPUs */
-	bool prefer_high_cap;
 };
 
 static inline struct schedtune *css_st(struct cgroup_subsys_state *css)
