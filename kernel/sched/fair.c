@@ -7100,19 +7100,6 @@ static int get_start_cpu(struct task_struct *p, bool sync_boost)
 			rd->max_cap_orig_cpu : rd->mid_cap_orig_cpu;
 	}
 
-
-	trace_sched_cpu_sel(p,
-			task_boost,
-			task_skip_min,
-			boosted,
-			task_boost_policy(p),
-			task_util(p),
-			cpu_util(task_cpu(p)),
-			test_task_ux(p),
-			task_demand_fits(p, rd->min_cap_orig_cpu),
-			sysctl_prefer_silver,
-			start_cpu);
-
 	if (start_cpu == rd->mid_cap_orig_cpu &&
 			!task_demand_fits(p, start_cpu))
 		start_cpu = rd->max_cap_orig_cpu;
