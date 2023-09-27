@@ -1904,16 +1904,16 @@ static int find_lowest_rq(struct task_struct *task)
 	struct cpumask *lowest_mask = this_cpu_cpumask_var_ptr(local_cpu_mask);
 	int this_cpu = smp_processor_id();
 	int cpu = -1;
-<<<<<<< HEAD
+
 #ifdef CONFIG_OPLUS_FEATURE_INPUT_BOOST_V4
 	int fbg_best_cpu = -1;
 	struct cpumask *fbg_target = NULL;
 #endif /* CONFIG_OPLUS_FEATURE_INPUT_BOOST_V4 */
-=======
+
 #ifdef CONFIG_OPLUS_CPU_AUDIO_PERF
 	unsigned int drop_cpu;
 #endif /* CONFIG_OPLUS_CPU_AUDIO_PERF */
->>>>>>> d65a1b503a49 ([SQUASH]: treewide: Remove oplus sched assist)
+
 
 	/* Make sure the mask is initialized first */
 	if (unlikely(!lowest_mask))
