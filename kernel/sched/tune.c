@@ -966,7 +966,6 @@ window_policy_write(struct cgroup_subsys_state *css, struct cftype *cft,
         return 0;
 }
 #endif
-#endif
 
 #ifdef CONFIG_STUNE_ASSIST
 static int sched_boost_override_write_wrapper(struct cgroup_subsys_state *css,
