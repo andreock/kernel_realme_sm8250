@@ -311,7 +311,7 @@ void operate_mode_switch(struct touchpanel_data *ts)
 		ts->ts_ops->mode_switch(ts->chip_data, MODE_NORMAL, true);
 	}
 }
-
+}
 static void tp_touch_down(struct touchpanel_data *ts, struct point_info points, int touch_report_num, int id)
 {
 	static int last_width_major;
