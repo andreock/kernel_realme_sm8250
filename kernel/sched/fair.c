@@ -7143,6 +7143,8 @@ enum fastpaths {
 	PREV_CPU_FASTPATH,
 };
 
+int schedtune_task_boost_rcu_locked(struct task_struct *tsk);
+
 static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 					struct task_struct *p,
 					struct find_best_target_env *fbt_env)
