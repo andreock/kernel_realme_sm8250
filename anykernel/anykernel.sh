@@ -4,7 +4,7 @@
 ### AnyKernel setup
 # begin properties
 properties() { '
-kernel.string=Realme GT Neo 2/3T Dragon 4
+kernel.string=Dragon 7 CLO AOSP/RUI
 do.devicecheck=0
 do.modules=0
 do.systemless=1
