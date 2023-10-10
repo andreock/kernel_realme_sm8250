@@ -134,7 +134,9 @@ struct schedtune {
 	/* Hint to bias scheduling of tasks on that SchedTune CGroup
 	 * towards idle CPUs */
 	int prefer_idle;
-
+	/* Hint to bias scheduling of tasks on that SchedTune CGroup
+	 * towards higher capacity CPUs */
+	bool prefer_high_cap;
 #ifdef OPLUS_FEATURE_POWER_CPUFREQ
 #ifdef CONFIG_SCHED_WALT
 	unsigned int window_policy;
@@ -213,6 +215,7 @@ root_schedtune = {
 	.ed_task_filter = false,
 #endif
 	.prefer_idle = 0,
+        .prefer_high_cap = false,
 #ifdef CONFIG_DYNAMIC_STUNE_BOOST
 	.boost_default = 0,
 	.sched_boost = 0,
@@ -688,6 +691,40 @@ int schedtune_prefer_idle(struct task_struct *p)
 	return prefer_idle;
 }
 
+bool schedtune_prefer_high_cap(struct task_struct *p)
+{
+	struct schedtune *st;
+	int prefer_high_cap;
+
+	if (unlikely(!schedtune_initialized))
+		return false;
+
+	/* Get prefer_high_cap value */
+	rcu_read_lock();
+	st = task_schedtune(p);
+	prefer_high_cap = st->prefer_high_cap;
+	rcu_read_unlock();
+
+	return prefer_high_cap;
+}
+
+static u64 prefer_high_cap_read(struct cgroup_subsys_state *css,
+				struct cftype *cft)
+{
+	struct schedtune *st = css_st(css);
+
+	return st->prefer_high_cap;
+}
+
+static int prefer_high_cap_write(struct cgroup_subsys_state *css,
+				 struct cftype *cft, u64 prefer_high_cap)
+{
+	struct schedtune *st = css_st(css);
+	st->prefer_high_cap = !!prefer_high_cap;
+
+	return 0;
+}
+
 static u64
 prefer_idle_read(struct cgroup_subsys_state *css, struct cftype *cft)
 {
@@ -1053,6 +1090,11 @@ static struct cftype files[] = {
 		.name = "prefer_idle",
 		.read_u64 = prefer_idle_read,
 		.write_u64 = prefer_idle_write_wrapper,
+	},
+	{
+		.name = "prefer_high_cap",
+		.read_u64 = prefer_high_cap_read,
+		.write_u64 = prefer_high_cap_write,
 	},
 #ifdef OPLUS_FEATURE_POWER_CPUFREQ
 #ifdef CONFIG_SCHED_WALT
