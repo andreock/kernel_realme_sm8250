@@ -2922,8 +2922,7 @@ try_to_wake_up(struct task_struct *p, unsigned int state, int wake_flags)
         g_rt_try_to_wake_up(p);
 #endif
 
-	cpu = select_task_rq(p, p->wake_cpu, SD_BALANCE_WAKE, wake_flags,
-			     sibling_count_hint);
+	cpu = select_task_rq(p, p->wake_cpu, SD_BALANCE_WAKE, wake_flags);
 
 	if (task_cpu(p) != cpu) {
 		wake_flags |= WF_MIGRATED;
