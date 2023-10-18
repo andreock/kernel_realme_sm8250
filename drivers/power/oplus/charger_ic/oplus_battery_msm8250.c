@@ -17168,7 +17168,7 @@ static int smb5_probe(struct platform_device *pdev)
 	struct power_supply *main_psy = NULL;
 	struct power_supply *bms_psy = NULL;
 	union power_supply_propval pval = {0, };
-	static reporting_not_ready_count = 0;
+	static int reporting_not_ready_count = 0;
 #endif
 	struct smb5 *chip;
 	struct smb_charger *chg;
