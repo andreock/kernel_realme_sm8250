@@ -25,16 +25,6 @@
  * satisfy the overall load at any given moment.
  */
 
-/*
- * This part of code is copied from Android common GKI kernel and unmodified.
- * Any change for these functions in upstream GKI would require extensive review
- * to make proper adjustment in vendor hook.
- */
-#define lsub_positive(_ptr, _val) do {				\
-	typeof(_ptr) ptr = (_ptr);				\
-	*ptr -= min_t(typeof(*ptr), *ptr, _val);		\
-} while (0)
-
 struct cass_cpu_cand {
 	int cpu;
 	unsigned int exit_lat;
@@ -121,7 +111,7 @@ static int cass_best_cpu(struct task_struct *p, int prev_cpu, bool sync)
 	 * preemptible and RCU-sched is unified with normal RCU. Therefore,
 	 * non-preemptible contexts are implicitly RCU-safe.
 	 */
-	for_each_cpu_and(cpu, cpumask_of(task_cpu(p)), cpu_active_mask) {
+	for_each_cpu_and(cpu, p->cpus_ptr, cpu_active_mask) {
 		/* Use the free candidate slot */
 		curr = &cands[cidx];
 		curr->cpu = cpu;
@@ -190,8 +180,7 @@ static int cass_best_cpu(struct task_struct *p, int prev_cpu, bool sync)
 }
 
 static int cass_select_task_rq_fair(struct task_struct *p, int prev_cpu,
-				    int sd_flag, int wake_flags,
-		                    int sibling_count_hint)
+				    int sd_flag, int wake_flags)
 {
 	bool sync;
 
@@ -204,8 +193,8 @@ static int cass_select_task_rq_fair(struct task_struct *p, int prev_cpu,
 	 * first valid CPU since it's possible for certain types of tasks to run
 	 * on inactive CPUs.
 	 */
-	if (unlikely(!cpumask_intersects(cpumask_of(task_cpu(p)), cpu_active_mask)))
-		return cpumask_first(cpumask_of(task_cpu(p)));
+	if (unlikely(!cpumask_intersects(p->cpus_ptr, cpu_active_mask)))
+		return cpumask_first(p->cpus_ptr);
 
 	/* cass_best_cpu() needs the task's utilization, so sync it up */
 	if (!(sd_flag & SD_BALANCE_FORK))
