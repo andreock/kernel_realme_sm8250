@@ -5094,7 +5094,7 @@ int idle_cpu(int cpu)
 	if (rq->ttwu_pending)
 		return 0;
 #endif
-
+#endif
 	return 1;
 }
 
