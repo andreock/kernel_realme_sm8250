@@ -483,40 +483,7 @@ static int lpm_cpuidle_select(struct cpuidle_driver *drv,
 static int lpm_cpuidle_enter(struct cpuidle_device *dev,
 		struct cpuidle_driver *drv, int idx)
 {
-	struct lpm_cpu *cpu = per_cpu(cpu_lpm, dev->cpu);
-	bool success = false;
-	const struct cpumask *cpumask = get_cpu_mask(dev->cpu);
-	ktime_t start = ktime_get();
-
-	cpu_prepare(cpu, idx, true);
-	cluster_prepare(cpu->parent, cpumask, idx, true, 0);
-
-	trace_cpu_idle_enter(idx);
-	lpm_stats_cpu_enter(idx, 0);
-
-	if (need_resched())
-		goto exit;
-
-	success = psci_enter_sleep(cpu, idx, true);
-
-exit:
-	lpm_stats_cpu_exit(idx, 0, success);
-
-	cluster_unprepare(cpu->parent, cpumask, idx, true, 0, success);
-	cpu_unprepare(cpu, idx, true);
-	dev->last_residency = ktime_us_delta(ktime_get(), start);
-	update_history(dev, idx);
-	trace_cpu_idle_exit(idx, success);
-	if (lpm_prediction && cpu->lpm_prediction) {
-		histtimer_cancel();
-		clusttimer_cancel();
-	}
-	if (cpu->bias) {
-                if (!idx)
-			biastimer_cancel();
-		cpu->bias = 0;
-	}
-	local_irq_enable();
+	wfi();
 	return idx;
 }
 
