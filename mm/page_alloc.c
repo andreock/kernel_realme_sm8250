@@ -80,9 +80,9 @@
 #include <linux/memory_isolate.h>
 #endif /*OPLUS_FEATURE_MEMORY_ISOLATE*/
 
+#if defined(OPLUS_FEATURE_MULTI_FREEAREA) && defined(CONFIG_PHYSICAL_ANTI_FRAGMENTATION)
 #include "multi_freearea.h"
-
-atomic_long_t kswapd_waiters = ATOMIC_LONG_INIT(0);
+#endif
 
 /* prevent >1 _updater_ of zone percpu pageset ->high and ->batch fields */
 static DEFINE_MUTEX(pcp_batch_high_lock);
@@ -4794,21 +4794,6 @@ __alloc_pages_slowpath(gfp_t gfp_mask, unsigned int order,
 	unsigned int cpuset_mems_cookie;
 	unsigned int zonelist_iter_cookie;
 	int reserve_flags;
-
-	bool woke_kswapd = false;
-	bool used_vmpressure = false;
-
-	/*
-	 * In the slowpath, we sanity check order to avoid ever trying to
-	 * reclaim >= MAX_ORDER areas which will never succeed. Callers may
-	 * be using allocators in order of preference for an area that is
-	 * too large.
-	 */
-	if (order >= MAX_ORDER) {
-		WARN_ON_ONCE(!(gfp_mask & __GFP_NOWARN));
-		return NULL;
-	}
-
 	/*
 	 * We also sanity check to catch abuse of atomic reserves being used by
 	 * callers that are not in atomic context.
@@ -4847,15 +4832,8 @@ restart:
 	if (!ac->preferred_zoneref->zone)
 		goto nopage;
 
-	if (gfp_mask & __GFP_KSWAPD_RECLAIM) {
-		if (!woke_kswapd) {
-			atomic_long_inc(&kswapd_waiters);
-			woke_kswapd = true;
-		}
-		if (!used_vmpressure)
-			used_vmpressure = vmpressure_inc_users(order);
+	if (alloc_flags & ALLOC_KSWAPD)
 		wake_all_kswapds(order, gfp_mask, ac);
-	}
 
 	/*
 	 * The adjusted alloc_flags might result in immediate success, so try
@@ -4948,8 +4926,6 @@ retry:
 		goto nopage;
 
 	/* Try direct reclaim and then allocating */
-	if (!used_vmpressure)
-		used_vmpressure = vmpressure_inc_users(order);
 	page = __alloc_pages_direct_reclaim(gfp_mask, order, alloc_flags, ac,
 							&did_some_progress);
 	if (page)
@@ -5008,10 +4984,8 @@ retry:
 	/* Avoid allocations with no watermarks from looping endlessly */
 	if (tsk_is_oom_victim(current) &&
 	    (alloc_flags == ALLOC_OOM ||
-	     (gfp_mask & __GFP_NOMEMALLOC))) {
-		gfp_mask |= __GFP_NOWARN;
+	     (gfp_mask & __GFP_NOMEMALLOC)))
 		goto nopage;
-	}
 
 	/* Retry as long as the OOM killer is making progress */
 	if (did_some_progress) {
@@ -5069,14 +5043,15 @@ nopage:
 		goto retry;
 	}
 fail:
+	warn_alloc(gfp_mask, ac->nodemask,
+			"page allocation failure: order:%u", order);
 got_pg:
-	if (woke_kswapd)
-		atomic_long_dec(&kswapd_waiters);
-	if (used_vmpressure)
-		vmpressure_dec_users();
-	if (!page)
-		warn_alloc(gfp_mask, ac->nodemask,
-				"page allocation failure: order:%u", order);
+#ifdef OPLUS_FEATURE_HEALTHINFO
+#ifdef CONFIG_OPLUS_MEM_MONITOR
+	memory_alloc_monitor(gfp_mask, order, jiffies_to_msecs(jiffies - oplus_alloc_start));
+	trace_android_vh_alloc_pages_slowpath(gfp_mask, order, oplus_alloc_start);
+#endif
+#endif /* OPLUS_FEATURE_HEALTHINFO */
 
 	return page;
 }

@@ -25,7 +25,7 @@ mmu-y			:= nommu.o
 mmu-$(CONFIG_MMU)	:= gup.o highmem.o memory.o mincore.o \
 			   mlock.o mmap.o mprotect.o mremap.o msync.o \
 			   page_vma_mapped.o pagewalk.o pgtable-generic.o \
-			   rmap.o vmalloc.o showmem.o
+			   rmap.o vmalloc.o
 
 
 ifdef CONFIG_MM_EVENT_STAT
@@ -42,7 +42,7 @@ obj-y			:= filemap.o mempool.o oom_kill.o fadvise.o \
 			   mm_init.o mmu_context.o percpu.o slab_common.o \
 			   compaction.o vmacache.o \
 			   interval_tree.o list_lru.o workingset.o \
-			   debug.o $(mmu-y) vmpressure.o
+			   debug.o $(mmu-y) showmem.o vmpressure.o
 
 obj-y += init-mm.o
 
