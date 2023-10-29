@@ -7,18 +7,15 @@
 };
 
 &CPU4 {
-	capacity-dmips-mhz = <1022>;
-	dynamic-power-coefficient = <340>;
+	dynamic-power-coefficient = <533>;
 };
 
 &CPU5 {
-	capacity-dmips-mhz = <1022>;
-	dynamic-power-coefficient = <340>;
+	dynamic-power-coefficient = <533>;
 };
 
 &CPU6 {
-	capacity-dmips-mhz = <1022>;
-	dynamic-power-coefficient = <340>;
+	dynamic-power-coefficient = <533>;
 };
 
 &CPU7 {
