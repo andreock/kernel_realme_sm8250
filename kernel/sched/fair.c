@@ -7443,11 +7443,6 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 				if (best_idle_cpu != -1)
 					continue;
 
-				if (best_prioritized_candidate) {
-					best_prioritized_cpu = i;
-					continue;
-				}
-
 				/*
 				 * Skip searching for active CPU for tasks have
 				 * high priority & prefer_high_cap.
@@ -7612,11 +7607,10 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 		 * accommodated in the higher capacity CPUs.
 		 */
 		if ((prefer_idle && best_idle_cpu != -1) ||
-		    (prioritized_task && best_prioritized_cpu != -1) ||
-		    (prefer_high_cap && p->prio > DEFAULT_PRIO &&
-		     (target_cpu != -1 ||
+		    (prefer_high_cap &&
+		     (best_idle_cpu != -1 || target_cpu != -1 ||
 		      (fbt_env->strict_max && most_spare_cap_cpu != -1)))) {
-			if (prioritized_task) {
+			if (prefer_high_cap && p->prio <= DEFAULT_PRIO) {
 				/*
 				 * For prefer_high_cap task, stop searching when
 				 * an idle cpu is found in mid cluster.
@@ -7635,11 +7629,6 @@ static void find_best_target(struct sched_domain *sd, cpumask_t *cpus,
 
 	if (prefer_idle && (best_idle_cpu != -1)) {
 		target_cpu = best_idle_cpu;
-		goto target;
-	}
-
-	if (prioritized_task && (best_prioritized_cpu != -1)) {
-		target_cpu = best_prioritized_cpu;
 		goto target;
 	}
 
