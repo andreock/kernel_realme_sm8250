@@ -1,1 +1,0 @@
-obj-y += smartpa_pm.c
