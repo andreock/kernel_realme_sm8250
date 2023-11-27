@@ -18,13 +18,13 @@ enum {
 #define chg_err(fmt, ...)                                                      \
 	({                                                                     \
 		if (oplus_log_level >= LOG_LEVEL_ERR)                          \
-			printk(KERN_ERR "[ERROR]: OPLUS_CHG" pr_fmt(fmt),      \
+			pr_debug(KERN_ERR "[ERROR]: OPLUS_CHG" pr_fmt(fmt),      \
 			       ##__VA_ARGS__);                                 \
 	})
 #define chg_info(fmt, ...)                                                     \
 	({                                                                     \
 		if (oplus_log_level >= LOG_LEVEL_ALL_ERR)                      \
-			printk(KERN_ERR "[INFO]: OPLUS_CHG" pr_fmt(fmt),       \
+			pr_debug(KERN_ERR "[INFO]: OPLUS_CHG" pr_fmt(fmt),       \
 			       ##__VA_ARGS__);                                 \
 		else if (oplus_log_level >= LOG_LEVEL_INFO)                    \
 			printk(KERN_INFO "[INFO]: OPLUS_CHG" pr_fmt(fmt),      \
@@ -33,13 +33,13 @@ enum {
 #define chg_debug(fmt, ...)                                                    \
 	({                                                                     \
 		if (oplus_log_level >= LOG_LEVEL_ALL_ERR)                      \
-			printk(KERN_ERR "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),      \
+			pr_debug(KERN_ERR "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),      \
 			       ##__VA_ARGS__);                                 \
 		else if (oplus_log_level >= LOG_LEVEL_ALL_INFO)                \
-			printk(KERN_INFO "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),     \
+			pr_debug(KERN_INFO "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),     \
 			       ##__VA_ARGS__);                                 \
 		else if (oplus_log_level >= LOG_LEVEL_DEBUG)                   \
-			printk(KERN_NOTICE "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),   \
+			pr_debug(KERN_NOTICE "[DEBUG]: OPLUS_CHG" pr_fmt(fmt),   \
 			       ##__VA_ARGS__);                                 \
 	})
 
