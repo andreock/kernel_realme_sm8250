@@ -27,7 +27,7 @@ enum {
 			pr_debug(KERN_ERR "[INFO]: OPLUS_CHG" pr_fmt(fmt),       \
 			       ##__VA_ARGS__);                                 \
 		else if (oplus_log_level >= LOG_LEVEL_INFO)                    \
-			printk(KERN_INFO "[INFO]: OPLUS_CHG" pr_fmt(fmt),      \
+			pr_debug(KERN_INFO "[INFO]: OPLUS_CHG" pr_fmt(fmt),      \
 			       ##__VA_ARGS__);                                 \
 	})
 #define chg_debug(fmt, ...)                                                    \
