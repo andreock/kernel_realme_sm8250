@@ -817,7 +817,7 @@ static int subsystem_shutdown(struct subsys_device *dev, void *data)
 	ret = dev->desc->shutdown(dev->desc, true);
 	if (ret < 0) {
 		if (!dev->desc->ignore_ssr_failure) {
-			panic("subsys-restart: [%s:%d]: Failed to shutdown %s!",
+			pr_err("subsys-restart: [%s:%d]: Failed to shutdown %s!",
 				current->comm, current->pid, name);
 		} else {
 			pr_err("Shutdown failure on %s\n", name);
@@ -868,7 +868,7 @@ static int subsystem_powerup(struct subsys_device *dev, void *data)
 			WARN(1, "SSR aborted: %s, system reboot/shutdown is under way\n",
 				name);
 		else if (!dev->desc->ignore_ssr_failure)
-			panic("[%s:%d]: Powerup error: %s!",
+			pr_err("[%s:%d]: Powerup error: %s!",
 				current->comm, current->pid, name);
 		else
 			pr_err("Powerup failure on %s\n", name);
@@ -880,7 +880,7 @@ static int subsystem_powerup(struct subsys_device *dev, void *data)
 		notify_each_subsys_device(&dev, 1, SUBSYS_POWERUP_FAILURE,
 								NULL);
 		if (!dev->desc->ignore_ssr_failure)
-			panic("[%s:%d]: Timed out waiting for error ready: %s!",
+			pr_err("[%s:%d]: Timed out waiting for error ready: %s!",
 				current->comm, current->pid, name);
 		else
 			return ret;
@@ -1290,7 +1290,7 @@ static void __subsystem_restart_dev(struct subsys_device *dev)
 			__pm_stay_awake(dev->ssr_wlock);
 			queue_work(ssr_wq, &dev->work);
 		} else {
-			panic("Subsystem %s crashed during SSR!", name);
+			pr_err("Subsystem %s crashed during SSR!", name);
 		}
 	} else
 		WARN(dev->track.state == SUBSYS_OFFLINE,
@@ -1501,7 +1501,7 @@ int subsystem_restart_dev(struct subsys_device *dev)
 	#endif
 		return 0;
 	default:
-		panic("subsys-restart: Unknown restart level!\n");
+		pr_err("subsys-restart: Unknown restart level!\n");
 		break;
 	}
 	module_put(dev->owner);
@@ -2253,7 +2253,7 @@ static ssize_t force_rst_write(struct file *file,
 	pr_info("%s: %s\n", __func__, read_buf);
 
 	if (!strncmp(read_buf, "2", 1)) {
-		panic("force esoc crash");
+		pr_debug("Hi I'm BBK and I don't know how to handle SDX55M");
 	}
 
 	if (!strncmp(read_buf, "1", 1) && (ts_send_error || ts_wait_error)) {
