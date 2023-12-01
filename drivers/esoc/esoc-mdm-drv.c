@@ -15,9 +15,9 @@
 /* Default number of powerup trial requests per session */
 #define ESOC_DEF_PON_REQ	3
 
-#define ESOC_MAX_PON_TRIES	5
+#define ESOC_MAX_PON_TRIES	20
 
-#define BOOT_FAIL_ACTION_DEF BOOT_FAIL_ACTION_PANIC
+#define BOOT_FAIL_ACTION_DEF BOOT_FAIL_ACTION_COLD_RESET
 
 enum esoc_pon_state {
 	PON_INIT,
@@ -271,6 +271,23 @@ static void esoc_client_link_mdm_crash(struct esoc_clink *esoc_clink)
 	}
 }
 
+static void mdm_force_reset(const struct subsys_desc *mdm_subsys)
+{
+	struct esoc_clink *esoc_clink =
+				container_of(mdm_subsys,
+						struct esoc_clink,
+							subsys);
+	struct mdm_ctrl *mdm = get_esoc_clink_data(esoc_clink);
+
+	esoc_mdm_log("MDM force reset\n");
+
+	if (mdm->pon_ops->soft_reset) {
+		mdm->pon_ops->soft_reset(mdm, true);
+	}
+
+	return;
+}
+
 static void mdm_crash_shutdown(const struct subsys_desc *mdm_subsys)
 {
 	struct esoc_clink *esoc_clink =
@@ -389,8 +406,11 @@ static int mdm_handle_boot_fail(struct esoc_clink *esoc_clink, u8 *pon_trial)
 	if (*pon_trial == atomic_read(&mdm_drv->n_pon_tries)) {
 		esoc_mdm_log("Reached max. number of boot trials\n");
 		atomic_set(&mdm_drv->boot_fail_action,
-					BOOT_FAIL_ACTION_PANIC);
+					BOOT_FAIL_ACTION_COLD_RESET);
 	}
+	else if (*pon_trial > atomic_read(&mdm_drv->n_pon_tries))
+		atomic_set(&mdm_drv->boot_fail_action,
+					BOOT_FAIL_ACTION_S3_RESET);
 
 	switch (atomic_read(&mdm_drv->boot_fail_action)) {
 	case BOOT_FAIL_ACTION_RETRY:
@@ -557,6 +577,7 @@ static int mdm_register_ssr(struct esoc_clink *esoc_clink)
 	subsys->ramdump = mdm_subsys_ramdumps;
 	subsys->powerup = mdm_subsys_powerup;
 	subsys->crash_shutdown = mdm_crash_shutdown;
+	subsys->force_reset = mdm_force_reset;
 	return esoc_clink_register_ssr(esoc_clink);
 }
 
