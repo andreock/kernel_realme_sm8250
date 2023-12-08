@@ -1,24 +1,24 @@
 #!/bin/bash
 
-#
-# Clone proton-clang toolchain if needed
-#
+config=sm8250_defconfig
 
-KERNEL_DEFCONFIG=vendor/sm8250_defconfig
-DIR=$PWD
-export ARCH=arm64
-export SUBARCH=arm64
-export CLANG_PATH="~/toolchains/bin"
-export PATH="$CLANG_PATH:$PATH"
-export CROSS_COMPILE=aarch64-linux-gnu-
-export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
-export KBUILD_BUILD_USER=Amog
-export KBUILD_BUILD_HOST=Us
+MAKE_PATH=../prebuilts/build-tools/bin/
+CROSS_COMPILE=../prebuilts/gcc/bin/aarch64-linux-android-
+KERNEL_ARCH=arm64
+KERNEL_OUT=../kernel_out
+export KERNEL_SRC=${KERNEL_OUT}
+export CLANG_TRIPLE=aarch64-linux-gnu-
+OUT_DIR=${KERNEL_OUT}
+ARCH=${KERNEL_ARCH}
+TARGET_INCLUDES=${TARGET_KERNEL_MAKE_CFLAGS}
+TARGET_LINCLUDES=${TARGET_KERNEL_MAKE_LDFLAGS}
 
-echo
-echo "Kernel is going to be built using $KERNEL_DEFCONFIG"
-echo
+TARGET_KERNEL_MAKE_ENV+="CC=../prebuilts/clang/bin/clang"
 
-make CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM=1 LLVM_IAS=1 O=out $KERNEL_DEFCONFIG
+${MAKE_PATH}make O=${OUT_DIR} ${TARGET_KERNEL_MAKE_ENV} LLVM_IAS=1 HOSTLDFLAGS="${TARGET_LINCLUDES}" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip -j16 LLVM_IAS=1 vendor/$config
 
-make CC=clang AR=llvm-ar NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM=1 LLVM_IAS=1 O=out -j$(nproc --all)
+# cd ${KERNEL_DIR} && \
+# ${MAKE_PATH}make O=${OUT_DIR} ${TARGET_KERNEL_MAKE_ENV} HOSTLDFLAGS="${TARGET_LINCLUDES}" ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} menuconfig
+
+cd ${OUT_DIR} && \
+${MAKE_PATH}make ARCH=${ARCH} CROSS_COMPILE=${CROSS_COMPILE} LLVM_IAS=1 HOSTCFLAGS="${TARGET_INCLUDES}" HOSTLDFLAGS="${TARGET_LINCLUDES}" O=${OUT_DIR} ${TARGET_KERNEL_MAKE_ENV} NM=llvm-nm OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump STRIP=llvm-strip LLVM_IAS=1 -j16
