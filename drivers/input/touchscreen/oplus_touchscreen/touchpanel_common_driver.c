@@ -235,13 +235,6 @@ void operate_mode_switch(struct touchpanel_data *ts)
 
 		if (ts->fingerprint_underscreen_support) {
 			ts->ts_ops->enable_fingerprint(ts->chip_data, !!ts->fp_enable);
-
-		if (ts->edge_limit_support || ts->fw_edge_limit_support) {
-			ts->ts_ops->mode_switch(ts->chip_data, MODE_EDGE, ts->limit_edge);
-		}
-
-		if (ts->game_switch_support) {
-			ts->ts_ops->mode_switch(ts->chip_data, MODE_GAME, ts->noise_level);
 		}
 
 		if (ts->mode_switch_type == SEQUENCE) {
